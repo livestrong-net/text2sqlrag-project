@@ -9,8 +9,7 @@ mangum  # AWS Lambda adapter for FastAPI
 docling                # Advanced PDF parsing with layout analysis
 docling-core           # Chunking infrastructure
 semchunk               # Semantic text splitting (used by HybridChunker)
-unstructured           # Lightweight version without PyTorch/ONNX (ARM64 compatible)
-pdfminer.six==20231228  # Pin compatible version for unstructured
+unstructured[pdf]      # PDF support via poppler (NO PyTorch/ONNX - ARM64 compatible)
 python-magic  # For file type detection (uses system libmagic on macOS)
 pillow  # Image processing for document parsing
 
