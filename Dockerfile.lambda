@@ -62,16 +62,58 @@ RUN chmod -R 755 ${LAMBDA_TASK_ROOT}/app && \
 # ============================================================================
 FROM public.ecr.aws/lambda/python:3.12
 
-# Install runtime dependencies for PDF processing
-# - poppler-utils: PDF parsing (pdftotext, pdfinfo, etc.)
-# - libxcb, libX11, libXext, libXrender: X11 libraries needed by poppler
+# Install comprehensive runtime dependencies for PDF processing with Unstructured library
+# Research: LAMBDA_DEPENDENCIES_RESEARCH.md
+#
+# Core PDF Processing:
+# - poppler, poppler-utils, poppler-glib: PDF parsing and manipulation
+#
+# OpenGL/Graphics (CRITICAL - fixes libGL.so.1 errors):
+# - mesa-libGL: Mesa OpenGL runtime (provides libGL.so.1)
+# - mesa-libGLU: Mesa OpenGL Utility library
+# - mesa-libgbm: Generic Buffer Management
+# - libglvnd-glx, libglvnd-egl: Vendor-neutral GL dispatch
+#
+# X11 Libraries (required by Mesa):
+# - libX11, libXext, libXrender: Core X11 libraries
+# - libxcb, libXau: X11 C bindings and authentication
+# - libXdamage, libXfixes, libXxf86vm: X11 extensions
+#
+# Image Processing:
+# - libpng, libjpeg-turbo, openjpeg2: Image format support
+# - libtiff: TIFF format support
+#
+# System Utilities:
+# - file-libs: File type detection (libmagic)
+# - glib2: Core GNOME libraries
+# - fontconfig: Font configuration and rendering
+#
 RUN dnf install -y \
+    poppler \
     poppler-utils \
-    libxcb \
+    poppler-glib \
+    mesa-libGL \
+    mesa-libGLU \
+    mesa-libgbm \
+    libglvnd-glx \
+    libglvnd-egl \
     libX11 \
     libXext \
     libXrender \
-    && dnf clean all
+    libxcb \
+    libXau \
+    libXdamage \
+    libXfixes \
+    libXxf86vm \
+    libpng \
+    libtiff \
+    libjpeg-turbo \
+    openjpeg2 \
+    file-libs \
+    glib2 \
+    fontconfig \
+    && dnf clean all \
+    && rm -rf /var/cache/dnf
 
 # Copy everything from builder stage (permissions already fixed)
 COPY --from=builder ${LAMBDA_TASK_ROOT} ${LAMBDA_TASK_ROOT}
