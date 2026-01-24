@@ -232,3 +232,74 @@ class VectorService:
 
         except Exception as e:
             raise Exception(f"Failed to delete vectors: {str(e)}")
+
+    def delete_all_vectors(self, namespace: str = "default") -> Dict[str, Any]:
+        """
+        Delete all vectors from a Pinecone namespace.
+
+        WARNING: This operation cannot be undone!
+
+        Args:
+            namespace: The namespace to clear (default: "default").
+                      Use "*" to clear all namespaces.
+
+        Returns:
+            Dictionary with deletion status:
+            {
+                'status': 'success' | 'failed',
+                'namespaces_cleared': [list of namespace names],
+                'message': str
+            }
+
+        Raises:
+            Exception if delete operation fails
+        """
+        if not self.index:
+            self.connect_to_index()
+
+        try:
+            if namespace == "*":
+                # Clear all namespaces
+                stats = self.get_index_stats()
+                namespaces_to_clear = list(stats.get('namespaces', {}).keys())
+
+                if not namespaces_to_clear:
+                    logger.info("No namespaces found to clear")
+                    return {
+                        'status': 'success',
+                        'namespaces_cleared': [],
+                        'message': 'No vectors found in index'
+                    }
+
+                # Delete all vectors from each namespace
+                for ns in namespaces_to_clear:
+                    logger.warning(f"Deleting ALL vectors from namespace: {ns}")
+                    self.index.delete(delete_all=True, namespace=ns)
+
+                logger.info(f"Cleared all vectors from {len(namespaces_to_clear)} namespaces")
+
+                return {
+                    'status': 'success',
+                    'namespaces_cleared': namespaces_to_clear,
+                    'message': f'Deleted all vectors from {len(namespaces_to_clear)} namespaces'
+                }
+            else:
+                # Clear specific namespace
+                logger.warning(f"Deleting ALL vectors from namespace: {namespace}")
+                self.index.delete(delete_all=True, namespace=namespace)
+
+                logger.info(f"Cleared all vectors from namespace: {namespace}")
+
+                return {
+                    'status': 'success',
+                    'namespaces_cleared': [namespace],
+                    'message': f'Deleted all vectors from namespace "{namespace}"'
+                }
+
+        except Exception as e:
+            logger.error(f"Failed to delete all vectors: {e}")
+            return {
+                'status': 'failed',
+                'namespaces_cleared': [],
+                'message': f'Failed to delete vectors: {str(e)}'
+            }
