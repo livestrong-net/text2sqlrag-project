@@ -219,7 +219,7 @@ jobs:
             "TRANSFORMERS_CACHE": "/tmp/.cache/huggingface",
             "UNSTRUCTURED_CACHE_DIR": "/tmp/.cache/unstructured",
             "DOCLING_CACHE_DIR": "/tmp/.cache/docling",
-            "USE_DOCKLING": "false"
+            "USE_DOCKLING": "true"
           }' /tmp/current-vars.json | jq '{Variables: .}' > /tmp/env-config.json
 
           echo "📋 Environment configuration to apply:"
