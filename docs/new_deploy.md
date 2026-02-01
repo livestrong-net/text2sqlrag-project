@@ -525,7 +525,7 @@ cat > /tmp/s3-lifecycle.json <<'EOF'
 {
   "Rules": [
     {
-      "Id": "DeleteOldCache",
+      "ID": "DeleteOldCache",
       "Status": "Enabled",
       "Filter": {},
       "Expiration": {
