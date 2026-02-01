@@ -17,6 +17,19 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+       # clear disk space ======
+      - name: Free disk space
+        run: |
+          echo "🧹 Freeing disk space on runner..."
+          df -h
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache
+          sudo docker system prune -af
+          df -h
+          echo  Disk cleanup completed"  
+
       - name: Print deployment info
         run: |
           echo "=========================================="
