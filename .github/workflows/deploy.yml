@@ -16,6 +16,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      - name: Free up disk space
+        run: |
+          echo "🧹 Freeing up disk space on GitHub Actions runner..."
+          echo ""
+          echo "📊 Disk space before cleanup:"
+          df -h /
+          echo ""
+
+          # Remove unnecessary pre-installed software
+          echo "🗑️  Removing unnecessary software..."
+          sudo rm -rf /usr/share/dotnet
+          sudo rm -rf /usr/local/lib/android
+          sudo rm -rf /opt/ghc
+          sudo rm -rf /opt/hostedtoolcache/CodeQL
+          sudo rm -rf /usr/local/share/boost
+          sudo rm -rf "$AGENT_TOOLSDIRECTORY"
+
+          # Clean up Docker
+          echo "🐳 Cleaning up Docker..."
+          docker system prune -af --volumes || true
+
+          # Clean up package caches
+          echo "📦 Cleaning up package caches..."
+          sudo apt-get clean
+          sudo rm -rf /var/lib/apt/lists/*
+
+          echo ""
+          echo "📊 Disk space after cleanup:"
+          df -h /
+          echo ""
+          echo "✅ Cleanup complete!"
+          echo ""
+
       - name: Checkout code
         uses: actions/checkout@v4
 
@@ -138,7 +171,18 @@ jobs:
             echo "   All future deployments will use this cached image"
             echo "   Expected deployment time: ~5-7 minutes (6-7x faster!)"
             echo ""
+
+            # Clean up Docker to free space for application build
+            echo "🧹 Cleaning up Docker build cache to free disk space..."
+            docker system prune -f
+            echo "✅ Cleanup complete"
+            echo ""
           fi
+
+          # Show disk space after base image handling
+          echo "📊 Disk space status:"
+          df -h / | grep -E "Filesystem|/$"
+          echo ""
 
       - name: Build Docker image
         env:
