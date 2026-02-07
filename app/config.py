@@ -30,7 +30,7 @@ class Settings(BaseSettings):
 
     # OPIK Monitoring
     OPIK_API_KEY: Optional[str] = None  # Optional for monitoring
-    OPIK_PROJECT_NAME: str = "Multi-Source-RAG"  # Add this line with your custom project name
+    OPIK_PROJECT_NAME: str = "RAG-Text2Sql"  # Add this line with your custom project name
 
     # Vanna 2.0 Configuration (Text-to-SQL)
     VANNA_MODEL: str = "gpt-4o"  # OpenAI model for SQL generation
